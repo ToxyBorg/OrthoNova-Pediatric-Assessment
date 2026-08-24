@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: patients
+    description: Patient records
+  - name: assessments
+    description: Assessment sessions and results
 paths:
   /healthz:
     get:
@@ -24,7 +28,144 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /patients:
+    get:
+      operationId: listPatients
+      tags: [patients]
+      summary: List patients
+      responses:
+        "200":
+          description: Patient list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Patient"
+    post:
+      operationId: createPatient
+      tags: [patients]
+      summary: Create a patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientInput"
+      responses:
+        "201":
+          description: Created patient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+  /patients/{id}:
+    get:
+      operationId: getPatient
+      tags: [patients]
+      summary: Get a patient
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Patient record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+        "404":
+          description: Not found
+    patch:
+      operationId: updatePatient
+      tags: [patients]
+      summary: Update a patient
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatientUpdate"
+      responses:
+        "200":
+          description: Updated patient
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Patient"
+  /assessments:
+    get:
+      operationId: listAssessments
+      tags: [assessments]
+      summary: List assessment sessions
+      responses:
+        "200":
+          description: Assessment list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AssessmentSession"
+    post:
+      operationId: createAssessment
+      tags: [assessments]
+      summary: Start an assessment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssessmentInput"
+      responses:
+        "201":
+          description: Created assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentSession"
+  /assessments/{id}:
+    get:
+      operationId: getAssessment
+      tags: [assessments]
+      summary: Get an assessment
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Assessment session
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentSession"
+    patch:
+      operationId: updateAssessment
+      tags: [assessments]
+      summary: Autosave an assessment
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssessmentUpdate"
+      responses:
+        "200":
+          description: Updated assessment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssessmentSession"
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
   schemas:
     HealthStatus:
       type: object
@@ -33,4 +174,74 @@ components:
           type: string
       required:
         - status
+    Patient:
+      type: object
+      required: [id, firstName, lastName, dateOfBirth, school, className, status]
+      properties:
+        id: { type: string }
+        firstName: { type: string }
+        lastName: { type: string }
+        dateOfBirth: { type: string }
+        school: { type: string }
+        className: { type: string }
+        guardian: { type: ["string", "null"] }
+        notes: { type: ["string", "null"] }
+        status: { type: string, enum: [demo, active, archived] }
+    PatientInput:
+      type: object
+      required: [firstName, lastName, dateOfBirth, school, className]
+      properties:
+        firstName: { type: string }
+        lastName: { type: string }
+        dateOfBirth: { type: string }
+        school: { type: string }
+        className: { type: string }
+        guardian: { type: string }
+        notes: { type: string }
+    PatientUpdate:
+      type: object
+      properties:
+        firstName: { type: string }
+        lastName: { type: string }
+        dateOfBirth: { type: string }
+        school: { type: string }
+        className: { type: string }
+        guardian: { type: string }
+        notes: { type: string }
+        status: { type: string, enum: [demo, active, archived] }
+    AssessmentSession:
+      type: object
+      required: [id, patientId, patientName, assessmentName, status, startedAt, progress]
+      properties:
+        id: { type: string }
+        patientId: { type: string }
+        patientName: { type: string }
+        assessmentName: { type: string }
+        status: { type: string, enum: [in_progress, completed] }
+        startedAt: { type: string }
+        completedAt: { type: ["string", "null"] }
+        progress: { type: number }
+        totalScore: { type: ["number", "null"] }
+        interpretation: { type: ["string", "null"] }
+        vpScore: { type: ["number", "null"] }
+        ranScore: { type: ["number", "null"] }
+        paScore: { type: ["number", "null"] }
+    AssessmentInput:
+      type: object
+      required: [patientId, patientName, assessmentName]
+      properties:
+        patientId: { type: string }
+        patientName: { type: string }
+        assessmentName: { type: string }
+    AssessmentUpdate:
+      type: object
+      properties:
+        status: { type: string, enum: [in_progress, completed] }
+        progress: { type: number }
+        completedAt: { type: string }
+        totalScore: { type: number }
+        interpretation: { type: string }
+        vpScore: { type: number }
+        ranScore: { type: number }
+        paScore: { type: number }
 

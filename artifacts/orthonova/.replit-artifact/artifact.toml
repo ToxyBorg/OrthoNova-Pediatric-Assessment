@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "OrthoNova"
+description = "A bilingual French and Arabic pediatric speech and language screening workspace for orthophonistes, with a guided child assessment mode, deterministic scoring, and professional reporting."
+version = "1.0.0"
+id = "artifacts/orthonova"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20569
+
+[services.development]
+run = "pnpm --filter @workspace/orthonova run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/orthonova", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/orthonova/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20569"
+BASE_PATH = "/"

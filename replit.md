@@ -1,6 +1,6 @@
-# [Project name]
+# OrthoNova
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+OrthoNova is a bilingual French/Arabic pediatric speech and language screening workspace for orthophonistes.
 
 ## Run & Operate
 
@@ -22,23 +22,33 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/orthonova/src/data/assessment-content.ts` — structured 17-item assessment definition
+- `artifacts/orthonova/src/lib/scoring.ts` — deterministic VP/RAN/PA scoring and threshold interpretation
+- `artifacts/orthonova/src/lib/i18n.tsx` — French/Arabic language state and RTL document direction
+- `artifacts/orthonova/src/pages/assessment.tsx` — clinician-controlled guided session and local progress state
+- `artifacts/api-server/src/routes/orthonova.ts` — typed patient and assessment API routes
+- `lib/db/src/schema/orthonova.ts` — PostgreSQL/Drizzle persistence model
+- `lib/api-spec/openapi.yaml` — API contract source of truth
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The assessment definition is data-driven so future age groups and languages can be added without duplicating the runner.
+- The final score follows the specification exactly: VP + (RAN / 1.8) + (PA / 5), with raw and normalized values kept distinct.
+- Arabic switches document direction to RTL while keeping the assessment’s visual stimuli intuitive.
+- Demo fallbacks keep the guided prototype navigable when persistence is unavailable; API contracts and Drizzle tables are ready for a database-backed implementation.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+The prototype provides a clinician dashboard, demo patient Lina Benali, patient management, assessment history, a 17-item guided assessment with two break points, automatic scoring, observations/notes, bilingual French/Arabic UI, RTL support, autosave feedback, and a professional results/report view.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+No additional user preferences recorded.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Run API code generation after changing `lib/api-spec/openapi.yaml`.
+- Item 12 and item 14 word sets were not included in the provided specification; their source-defined content remains explicitly configurable rather than being silently invented.
 
 ## Pointers
 
